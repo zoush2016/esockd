@@ -121,7 +121,7 @@ listener({Protocol, Port}) ->
 %% Supervisor callbacks
 %%%=============================================================================
 init([]) ->
-    {ok, {{one_for_one, 10, 100}, [?CHILD(esockd_server, worker)]} }.
+    {ok, {{one_for_one, 10, 100}, [?CHILD(esockd_server, worker), ?CHILD(esockd_monitor, worker)]}}.
 
 %%%=============================================================================
 %%% Internal functions

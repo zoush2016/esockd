@@ -1,0 +1,128 @@
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {local,sasl_safe_sup}
+             started: [{pid,<0.39.0>},
+                       {name,alarm_handler},
+                       {mfargs,{alarm_handler,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,2000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {local,sasl_safe_sup}
+             started: [{pid,<0.40.0>},
+                       {name,overload},
+                       {mfargs,{overload,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,2000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {local,sasl_sup}
+             started: [{pid,<0.38.0>},
+                       {name,sasl_safe_sup},
+                       {mfargs,
+                           {supervisor,start_link,
+                               [{local,sasl_safe_sup},sasl,safe]}},
+                       {restart_type,permanent},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {local,sasl_sup}
+             started: [{pid,<0.41.0>},
+                       {name,release_handler},
+                       {mfargs,{release_handler,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,2000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+         application: sasl
+          started_at: nonode@nohost
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {local,esockd_sup}
+             started: [{pid,<0.49.0>},
+                       {name,esockd_server},
+                       {mfargs,{esockd_server,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,5000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {local,esockd_sup}
+             started: [{pid,<0.50.0>},
+                       {name,esockd_monitor},
+                       {mfargs,{esockd_monitor,start_link,[]}},
+                       {restart_type,permanent},
+                       {shutdown,5000},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+         application: esockd
+          started_at: nonode@nohost
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {<0.53.0>,esockd_listener_sup}
+             started: [{pid,<0.54.0>},
+                       {name,connection_sup},
+                       {mfargs,
+                           {esockd_connection_sup,start_link,
+                               [{echo_server,start_link,[]}]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {<0.53.0>,esockd_listener_sup}
+             started: [{pid,<0.55.0>},
+                       {name,acceptor_sup},
+                       {mfargs,
+                           {esockd_acceptor_sup,start_link,
+                               [<0.54.0>,#Fun<esockd_server.0.76791649>,
+                                {gen_logger,console_logger,4}]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {<0.53.0>,esockd_listener_sup}
+             started: [{pid,<0.56.0>},
+                       {name,listener},
+                       {mfargs,
+                           {esockd_listener,start_link,
+                               [echo,5000,
+                                [{access,[{allow,all}]},
+                                 {acceptors,32},
+                                 {max_clients,1000000},
+                                 binary,
+                                 {packet,raw},
+                                 {reuseaddr,true},
+                                 {backlog,1024},
+                                 {nodelay,false}],
+                                <0.55.0>,
+                                {gen_logger,console_logger,4}]}},
+                       {restart_type,transient},
+                       {shutdown,4294967295},
+                       {child_type,worker}]
+
+=PROGRESS REPORT==== 16-Mar-2015::21:04:40 ===
+          supervisor: {local,esockd_sup}
+             started: [{pid,<0.53.0>},
+                       {name,{listener_sup,{echo,5000}}},
+                       {mfargs,
+                           {esockd_listener_sup,start_link,
+                               [echo,5000,
+                                [{access,[{allow,all}]},
+                                 {acceptors,32},
+                                 {max_clients,1000000},
+                                 binary,
+                                 {packet,raw},
+                                 {reuseaddr,true},
+                                 {backlog,1024},
+                                 {nodelay,false}],
+                                {echo_server,start_link,[]}]}},
+                       {restart_type,transient},
+                       {shutdown,infinity},
+                       {child_type,supervisor}]

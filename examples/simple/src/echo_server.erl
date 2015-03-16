@@ -32,10 +32,10 @@
 -export([start_link/1, init/1, loop/3]).
 
 -define(TCP_OPTIONS, [
-		binary,
-		{packet, raw},
+		%binary,
+		%{packet, raw},
 		{reuseaddr, true},
-		{backlog, 128},
+		{backlog, 1024},
 		{nodelay, false}]).
 
 %%------------------------------------------------------------------------------
@@ -53,8 +53,8 @@ start(Port) when is_integer(Port) ->
     esockd:start(),
     Access = application:get_env(esockd, access, [{allow, all}]),
     SockOpts = [{access, Access},
-                {acceptors, 10}, 
-                {max_clients, 1024} | ?TCP_OPTIONS],
+                {acceptors, 32}, 
+                {max_clients, 1000000} | ?TCP_OPTIONS],
     MFArgs = {?MODULE, start_link, []},
     esockd:open(echo, Port, SockOpts, MFArgs).
 
@@ -74,8 +74,8 @@ init(SockArgs = {Transport, _Sock, _SockFun}) ->
 loop(Transport, Sock, State) ->
 	case Transport:recv(Sock, 0) of
 		{ok, Data} ->
-			{ok, PeerName} = Transport:peername(Sock),
-			io:format("~s - ~s~n", [esockd_net:format(peername, PeerName), Data]),
+			%{ok, PeerName} = Transport:peername(Sock),
+			%io:format("~s - ~s~n", [esockd_net:format(peername, PeerName), Data]),
 			Transport:send(Sock, Data),
 			loop(Transport, Sock, State);
 		{error, Reason} ->

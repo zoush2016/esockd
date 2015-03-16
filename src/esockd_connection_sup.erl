@@ -28,31 +28,63 @@
 
 -author('feng@emqtt.io').
 
--behaviour(supervisor).
+-behaviour(gen_server).
 
 %% API
 -export([start_link/1, start_connection/2, count_connection/1]).
 
-%% supervisor callback
--export([init/1]).
+%% ------------------------------------------------------------------
+%% gen_server Function Exports
+%% ------------------------------------------------------------------
+
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2,
+         terminate/2, code_change/3]).
+
 
 start_link(Callback) ->
-    supervisor:start_link(?MODULE, [Callback]).
+	gen_server:start_link(?MODULE, [Callback], []).
 
 start_connection(Sup, SockArgs) ->
-    supervisor:start_child(Sup, [SockArgs]).
+	gen_server:call(Sup, {start_child, SockArgs}).
 
 count_connection(Sup) ->
-    Children = supervisor:count_children(Sup), 
-    proplists:get_value(workers, Children).
+	gen_server:call(Sup, count_connection).
+
+%% ------------------------------------------------------------------
+%% gen_server Function Definitions
+%% ------------------------------------------------------------------
 
 init([Callback]) ->
-    ChildSpec = {connection,
-                    {esockd_connection, start_link, [Callback]},
-                        temporary, 5000, worker, [mod(Callback)]},
-    {ok, {{simple_one_for_one, 0, 3600}, [ChildSpec]}}.
+	process_flag(trap_exit, true),
+    {ok, {0, Callback}}.
 
-mod(M) when is_atom(M) -> M;
-mod({M, _F}) when is_atom(M) -> M;
-mod({M, _F, _A}) when is_atom(M) -> M.
+handle_call({start_child, SockArgs}, _From, {Count, Callback}) ->
+	case esockd_connection:start_link(Callback, SockArgs) of
+		{ok, Pid} -> 
+			{reply, {ok, Pid}, {Count+1, Callback}};
+		Error ->
+			{reply, Error, {Count, Callback}}
+	end;
+
+handle_call(count_connection, _From, {Count, Callback}) ->
+    {reply, Count, {Count, Callback}}.
+
+handle_cast(_Msg, State) ->
+    {noreply, State}.
+
+handle_info({'EXIT', _PID, _Reason}, {Count, Callback}) ->
+    {noreply, {Count-1, Callback}};
+
+handle_info(_Info, State) ->
+    {noreply, State}.
+
+terminate(_Reason, _State) ->
+    ok.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
+
+%% ------------------------------------------------------------------
+%% Internal Function Definitions
+%% ------------------------------------------------------------------
 

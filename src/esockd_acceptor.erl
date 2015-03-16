@@ -102,8 +102,11 @@ handle_info({inet_async, LSock, Ref, {ok, Sock}}, State = #state{manager = Manag
     Logger:info("~s - Accept from ~s~n", [SockName, esockd_net:format(peername, Peername)]),
     case tune_buffer_size(Sock) of
         ok -> 
-            case esockd_manager:new_connection(Manager, Mod, Sock, SockFun) of
-                {ok, _Pid} ->
+            SockArgs = {esockd_transport, Sock, SockFun},
+            case esockd_connection_sup:start_connection(Manager, SockArgs) of
+                {ok, ConnPid} ->
+                    Mod:controlling_process(Sock, ConnPid),
+                    esockd_connection:ready(ConnPid, SockArgs),
                     ok;
                 {error, Reason} ->
                     Logger:error("failed to start connection on ~s - ~p", [SockName, Reason]),
