@@ -87,5 +87,3 @@ terminate(_Reason, _State) ->
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
-
-%[registered_name, memory, message_queue_len,heap_size,total_heap_size, initial_call]
