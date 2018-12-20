@@ -193,7 +193,7 @@ getopts(#proxy_socket{socket = Sock}, OptionNames) ->
 setopts(Sock, Opts) when is_port(Sock) ->
     inet:setopts(Sock, Opts);
 setopts(#ssl_socket{ssl = SslSock}, Opts) ->
-    ssl:setopts(SslSock, Opts);
+    ssl:setopts(SslSock, proplists:delete(active, Opts));
 setopts(#proxy_socket{socket = Socket}, Opts) ->
     setopts(Socket, Opts).
 
